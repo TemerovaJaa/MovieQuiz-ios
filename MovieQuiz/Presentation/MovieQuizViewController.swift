@@ -1,6 +1,7 @@
 import UIKit
 
-final class MovieQuizViewController: UIViewController {
+final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
+    
     
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var textLabel: UILabel!
@@ -29,15 +30,29 @@ final class MovieQuizViewController: UIViewController {
     private var currentQuestionIndex = 0
     private var correctAnswers = 0
     private let questionsAmount: Int = 10
-    private let questionFactory: QuestionFactory = QuestionFactory()
+    
     private var currentQuestion: QuizQuestion?
+    private var questionFactory: QuestionFactoryProtocol?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        if let firstQuestion = questionFactory.requestNextQuestion() {
-            currentQuestion = firstQuestion
-            let viewModel = convert(model: firstQuestion)
-            show(quiz: viewModel)
+        
+        questionFactory = QuestionFactory(delegate: self) {
+        
+        questionFactory?.requestNextQuestion()
+        }
+    }
+    // MARK: - QuestionFactoryDelegate
+
+    func didReceiveNextQuestion(question: QuizQuestion?) {
+        guard let question = question else {
+            return
+        }
+        
+        currentQuestion = question
+        let viewModel = convert(model: question)
+        DispatchQueue.main.async { [weak self] in
+            self?.show(quiz: viewModel)
         }
     }
     
@@ -85,12 +100,7 @@ final class MovieQuizViewController: UIViewController {
         }
         
         
-        if let firstQuestion = self.questionFactory.requestNextQuestion() {
-            self.currentQuestion = firstQuestion
-            let viewModel = self.convert(model: firstQuestion)
-            
-            self.show(quiz: viewModel)
-        }
+        questionFactory?.requestNextQuestion()
         
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
@@ -111,12 +121,7 @@ final class MovieQuizViewController: UIViewController {
             show(quiz: viewModel)
         } else {
             currentQuestionIndex += 1
-            if let nextQuestion = questionFactory.requestNextQuestion() {
-                currentQuestion = nextQuestion
-                let viewModel = convert(model: nextQuestion)
-                
-                show(quiz: viewModel)
-            }
+            self.questionFactory?.requestNextQuestion()
         }
         imageView.layer.borderColor = UIColor.clear.cgColor
     }
