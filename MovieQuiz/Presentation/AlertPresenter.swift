@@ -4,7 +4,7 @@ import Foundation
 import UIKit
 
 class AlertPresenter {
-    func presenter (contoller: UIViewController, model: AlertModel) {
+    func presenter (controller: UIViewController, model: AlertModel) {
             let alert = UIAlertController(
                 title: model.title,
                 message: model.message,
@@ -14,7 +14,7 @@ class AlertPresenter {
             
             alert.addAction(action)
             
-            contoller.present(alert, animated: true, completion: nil)
+            controller.present(alert, animated: true, completion: nil)
         }
     }
 
