@@ -1,7 +1,7 @@
 import UIKit
 
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
-    
+   
     
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var textLabel: UILabel!
@@ -27,6 +27,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
     }
     
+    
     private var currentQuestionIndex = 0
     private var correctAnswers = 0
     private let questionsAmount: Int = 10
@@ -37,7 +38,23 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        var documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let fileName = "inception.json"
+        documentsURL.appendPathComponent(fileName)
+        let jsonString = try? String(contentsOf: documentsURL)
         
+        guard let data = jsonString.data(using: .utf8) else {
+            return
+        }
+        do {
+            let title = json?["title"]
+            let year = json?["year"]
+            let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+            print(json)
+        } catch {
+            print("Failed to parse: \(jsonString)")
+        }
+      
         questionFactory = QuestionFactory(delegate: self)
         questionFactory?.requestNextQuestion()
         alertPresenter = AlertPresenter()
@@ -120,6 +137,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             self.questionFactory?.requestNextQuestion()
         }
         imageView.layer.borderColor = UIColor.clear.cgColor
+        print(NSHomeDirectory())
     }
+    
 }
 
