@@ -59,7 +59,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         questionFactory?.requestNextQuestion()
         alertPresenter = AlertPresenter()
     }
-
+    
     func getMovie(from jsonString: String) -> Movie? {
         var movie: Movie? = nil
         do {
@@ -196,4 +196,5 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
 }
+
 
