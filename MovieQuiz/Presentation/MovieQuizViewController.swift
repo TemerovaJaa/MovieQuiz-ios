@@ -41,9 +41,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         var documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         let fileName = "inception.json"
         documentsURL.appendPathComponent(fileName)
-        let jsonString = try String?(contentsOf: documentsURL)
+        let jsonString = try? String(contentsOf: documentsURL)
         
-        guard let data = jsonString.data(using: .utf8) else {
+        guard let data = jsonString?.data(using: .utf8) else {
             return
         }
         do {
