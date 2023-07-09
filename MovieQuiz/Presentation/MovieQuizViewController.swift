@@ -47,9 +47,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             return
         }
         do {
+            let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
             let title = json?["title"]
             let year = json?["year"]
-            let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+            
             print(json)
         } catch {
             print("Failed to parse: \(jsonString)")

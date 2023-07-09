@@ -38,10 +38,10 @@ final class StatisticServiceImplementation: StatisticService {
     
     func store(correct count: Int, total amount: Int) {
         if bestGame.correct < count   {
-            print (GameRecord(correct: <#T##Int#>, total: <#T##Int#>, date: <#T##Date#>))
-        } else {
+            print (GameRecord(correct: count, total: amount, date: Date()))
+                   } else {
             bestGame.correct
         }
         
     }
-}
+                   }
