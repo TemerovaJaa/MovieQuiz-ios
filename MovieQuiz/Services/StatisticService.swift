@@ -19,7 +19,7 @@ final class StatisticServiceImplementation: StatisticService {
     var bestGame: GameRecord {
         get {
             guard let data = userDefaults.data(forKey: Keys.bestGame.rawValue),
-            let record = try? JSONDecoder().decode(GameRecord.self, from: data) else {
+                  let record = try? JSONDecoder().decode(GameRecord.self, from: data) else {
                 return .init(correct: 0, total: 0, date: Date())
             }
             
@@ -37,10 +37,11 @@ final class StatisticServiceImplementation: StatisticService {
     }
     
     func store(correct count: Int, total amount: Int) {
-        if bestGame.correct < correct   {
-            print (bestGame(correct: <#T##Int#>, total: <#T##Int#>, date: <#T##Date#>))
+        if bestGame.correct < count   {
+            print (GameRecord(correct: <#T##Int#>, total: <#T##Int#>, date: <#T##Date#>))
         } else {
             bestGame.correct
+        }
+        
     }
-    
 }
