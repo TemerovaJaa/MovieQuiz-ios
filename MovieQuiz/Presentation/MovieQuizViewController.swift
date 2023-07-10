@@ -144,6 +144,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     buttonText: result.buttonText,
     completion: { [weak self] _ in
         guard let self = self else { return }
+        self.bestGame = 0 
         self.currentQuestionIndex = 0
         self.correctAnswers = 0
         self.questionFactory?.requestNextQuestion()
