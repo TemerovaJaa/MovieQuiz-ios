@@ -7,6 +7,7 @@ protocol StatisticService {
     var bestGame: GameRecord { get }
     func store(correct count: Int, total amount: Int)
 }
+
 final class StatisticServiceImplementation: StatisticService {
     private let userDefaults = UserDefaults.standard
     private enum Keys: String {
@@ -40,9 +41,30 @@ final class StatisticServiceImplementation: StatisticService {
         gamesCount += 1
         if bestGame.correct < count   {
             print (GameRecord(correct: count, total: amount, date: Date()))
-                   } else {
+        } else {
             bestGame.correct
         }
         
     }
-                   }
+    var correct: Int {
+        get
+        { userDefaults.integer(forKey: Keys.total.rawValue) }
+        set
+        { userDefaults.set(newValue, forKey: Keys.total.rawValue) }
+    }
+    var total: Int {
+        get
+        { userDefaults.integer(forKey: Keys.total.rawValue) }
+        set
+        { userDefaults.set(newValue, forKey: Keys.total.rawValue) }
+        
+    }
+        
+    var totalAccuracy: Double {
+        if total == 0 { return 0 }
+        return (Double(total) /
+        Double(correct)) * 100
+        }
+        
+    
+}
