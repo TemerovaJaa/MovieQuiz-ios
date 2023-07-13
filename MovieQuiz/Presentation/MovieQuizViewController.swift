@@ -138,6 +138,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     private func show(quiz result: QuizResultsViewModel) {
+       let quantityText = "Количество сыгранных квизов:\(StatisticService.gamesCount)"
+        let resultText = "Ваш результат:\(correctAnswers)\(questionsAmount)"
         let alertModel = AlertModel(
     title: result.title,
     message:result.text,

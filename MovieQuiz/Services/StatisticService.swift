@@ -13,7 +13,6 @@ final class StatisticServiceImplementation: StatisticService {
     private enum Keys: String {
         case correct, total, bestGame, gamesCount
     }
-    var totalAccuracy: Double = 0.0
     
     var gamesCount: Int = 0
     
