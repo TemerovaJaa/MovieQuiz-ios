@@ -1,6 +1,7 @@
 import UIKit
 
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
+    private var statisticService: StatisticService?
     
     
     @IBOutlet private var imageView: UIImageView!
@@ -38,6 +39,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        statisticService = StatisticServiceImplementation()
         var documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         let fileName = "inception.json"
         documentsURL.appendPathComponent(fileName)
@@ -138,7 +140,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     private func show(quiz result: QuizResultsViewModel) {
-       let quantityText = "Количество сыгранных квизов:\(StatisticService.gamesCount)"
+        let quantityText = "Количество сыгранных квизов:\(String(describing: statisticService?.gamesCount) )"
         let resultText = "Ваш результат:\(correctAnswers)\(questionsAmount)"
         let alertModel = AlertModel(
     title: result.title,
