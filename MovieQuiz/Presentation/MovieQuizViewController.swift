@@ -1,6 +1,7 @@
 import UIKit
 
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
+    private var statisticService: StatisticService?
     
     
     @IBOutlet private var imageView: UIImageView!
@@ -38,6 +39,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        statisticService = StatisticServiceImplementation()
         var documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
         let fileName = "inception.json"
         documentsURL.appendPathComponent(fileName)
@@ -51,9 +53,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             let title = json?["title"]
             let year = json?["year"]
             
-            print(json)
+            print(json as Any)
         } catch {
-            print("Failed to parse: \(jsonString)")
+            print("Failed to parse: \(String(describing: jsonString))")
         }
         
         questionFactory = QuestionFactory(delegate: self)
@@ -138,6 +140,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     private func show(quiz result: QuizResultsViewModel) {
+        let resultText = "Ваш резуьтат:\(correctAnswers)\(questionsAmount)"
+        let quantityText = "Количество сыгранных квизов: \(String(describing: statisticService?.gamesCount))"
         let alertModel = AlertModel(
     title: result.title,
     message:result.text,
