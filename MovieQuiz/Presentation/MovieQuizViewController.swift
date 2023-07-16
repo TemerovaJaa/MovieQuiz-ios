@@ -50,8 +50,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
         do {
             let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
-            let title = json?["title"]
-            let year = json?["year"]
+            _ = json?["title"]
+            _ = json?["year"]
             
             print(json as Any)
         } catch {
@@ -140,8 +140,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     private func show(quiz result: QuizResultsViewModel) {
-        let resultText = "Ваш резуьтат:\(correctAnswers)\(questionsAmount)"
-        let quantityText = "Количество сыгранных квизов: \(String(describing: statisticService?.gamesCount))"
+        _ = "Ваш резуьтат:\(correctAnswers)\(questionsAmount)"
+        _ = "Количество сыгранных квизов: \(String(describing: statisticService?.gamesCount))"
         let alertModel = AlertModel(
     title: result.title,
     message:result.text,
