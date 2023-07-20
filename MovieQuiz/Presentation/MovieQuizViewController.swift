@@ -1,6 +1,7 @@
 import UIKit
 
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
+    private var statisticService: StatisticService?
     
     func didReceiveNextQuestion(question: QuizQuestion?) {
         presenter.didReceiveNextQuestion(question: question)
@@ -66,12 +67,12 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
         do {
             let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
-            let title = json?["title"]
-            let year = json?["year"]
+            _ = json?["title"]
+            _ = json?["year"]
             
-            print(json)
+            print(json as Any)
         } catch {
-            print("Failed to parse: \(jsonString)")
+            print("Failed to parse: \(String(describing: jsonString))")
         }
         
         questionFactory = QuestionFactory(delegate: self)
