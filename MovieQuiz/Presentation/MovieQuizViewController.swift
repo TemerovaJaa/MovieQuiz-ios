@@ -1,7 +1,11 @@
 import UIKit
 
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
+    
+    var alertPresenter: AlertPresenterProtocol?
     private var statisticService: StatisticService?
+    private var currentQuestion: QuizQuestion?
+    private var questionFactory: QuestionFactoryProtocol?
     
     func didReceiveNextQuestion(question: QuizQuestion?) {
         presenter.didReceiveNextQuestion(question: question)
@@ -15,18 +19,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
-    
-    private var statisticService: StatisticService?
-    
-    var alertPresenter: AlertPresenterProtocol?
-    private var currentQuestion: QuizQuestion?
-    private var questionFactory: QuestionFactoryProtocol?
-    private var alertPresenter: AlertPresenter?
-    
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet private var counterLabel: UILabel!
-    
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
         guard let currentQuestion = currentQuestion else {
             return
@@ -37,7 +32,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
     }
     
-    @IBAction private func noButtonClicked(_ sender: UIButton) {
+    private func noButtonClicked(_ sender: UIButton) {
         guard let currentQuestion = currentQuestion else {
             return
         }
@@ -77,7 +72,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         questionFactory = QuestionFactory(delegate: self)
         questionFactory?.requestNextQuestion()
-        alertPresenter = AlertPresenter()
+        alertPresenter = AlertPresenter(delegate: <#UIViewController#>)
     }
     
     func getMovie(from jsonString: String) -> Movie? {
@@ -185,7 +180,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         
     }
-    
+
     private func showNextQuestionOrResults() {
         imageView.layer.borderWidth = 0
         if presenter.isLastQuestion() {
