@@ -6,14 +6,14 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     private var statisticService: StatisticService?
     private var currentQuestion: QuizQuestion?
     private var questionFactory: QuestionFactoryProtocol?
+    var presenter: StatisticService?
     
     func didReceiveNextQuestion(question: QuizQuestion?) {
-        presenter.didReceiveNextQuestion(question: question)
         guard let question = question else {
             return
         }
         currentQuestion = question
-        let viewModel = presenter.convert(model: question)
+        let viewModel = convert(model: question)
         DispatchQueue.main.async { [weak self] in
             self?.show(quiz: viewModel)
         }
@@ -72,7 +72,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
         questionFactory = QuestionFactory(delegate: self)
         questionFactory?.requestNextQuestion()
-        alertPresenter = AlertPresenter(delegate: <#UIViewController#>)
+        alertPresenter = AlertPresenter(delegate: self)
     }
     
     func getMovie(from jsonString: String) -> Movie? {
@@ -183,9 +183,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
 
     private func showNextQuestionOrResults() {
         imageView.layer.borderWidth = 0
-        if presenter.isLastQuestion() {
+        if currentQuestionIndex == questionsAmount {
             imageView.layer.borderWidth = 8
-            statisticService?.store(correct: correctAnswers, total: presenter.questionsAmount)
+            statisticService?.store(correct: correctAnswers, total: questionsAmount)
             guard let gamesCount = statisticService?.gamesCount else {
                 return }
             guard let bestGame = statisticService?.bestGame else {
@@ -202,18 +202,19 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         Средняя точность: \(String(format: "%.2f", totalAccuracy))%
         """ ,
                                           buttonText: "Сыграть еще раз",
-                                          completion: { [weak self] in
+                                          completion: { [weak self] _ in
                 guard let self = self else { return }
                 self.imageView.layer.borderWidth = 0
-                self.presenter.resetQuestionIndex()
+//                self.presenter.resetQuestionIndex()
                 self.correctAnswers = 0
                 self.questionFactory?.requestNextQuestion()
             })
             alertPresenter?.showQuizResult(model: finalScreen)
         } else {
-            presenter.switchToNextQuestion()
+   //         presenter.switchToNextQuestion()
             currentQuestionIndex += 1
             questionFactory?.requestNextQuestion()
+        
         }
         
     }

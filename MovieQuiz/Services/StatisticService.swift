@@ -16,6 +16,7 @@ final class StatisticServiceImplementation: StatisticService {
     
     var gamesCount: Int = 0
     
+    
     var bestGame: GameRecord {
         get {
             guard let data = userDefaults.data(forKey: Keys.bestGame.rawValue),

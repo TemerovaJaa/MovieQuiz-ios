@@ -18,8 +18,8 @@ class AlertPresenter: AlertPresenterProtocol {
             preferredStyle: .alert)
         let action = UIAlertAction(
             title: model.buttonText,
-            style: .default) { _ in
-                model.completion(<#UIAlertAction#>)}
+            style: .default) { pressedActions in
+                model.completion(pressedActions)}
         
         alert.addAction(action)
         
