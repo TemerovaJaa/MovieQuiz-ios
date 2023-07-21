@@ -154,7 +154,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
                 
             }
         )
-        alertPresenter?.presenter(controller: self, model: alertModel)
+        alertPresenter?.showQuizResult(model: alertModel)
     }
     
     private func showAnswerResults(isCorrect: Bool) {
@@ -196,7 +196,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             
             let finalScreen = AlertModel (title: "Этот раунд окончен!",
                                           message: """
-        Ваш результат: \(correctAnswers)/\(presenter.questionsAmount)
+        Ваш результат: \(correctAnswers)/\(questionsAmount)
          Количество сыгранных квизов: \(gamesCount)
          Рекорд: \(bestGame.correct)/\(bestGame.total) (\(bestGame.date.dateTimeString))
         Средняя точность: \(String(format: "%.2f", totalAccuracy))%
