@@ -43,9 +43,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     
-    private var currentQuestionIndex = 0
-    private var correctAnswers = 0
-    private let questionsAmount: Int = 10
+    private var currentQuestionIndex = 0 // Номер текущего вопроса
+    private var correctAnswers = 0 // Количество правильных ответов
+    private let questionsAmount: Int = 10 // Счетчик вопросов
     
     
     
@@ -140,8 +140,8 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
     
     private func show(quiz result: QuizResultsViewModel) {
-        let quantityText = "Количество сыгранных квизов:\(String(describing: statisticService?.gamesCount) )"
-        let resultText = "Ваш результат:\(correctAnswers)\(questionsAmount)"
+        _ = "Количество сыгранных квизов:\(String(describing: statisticService?.gamesCount) )"
+        _ = "Ваш результат:\(correctAnswers)\(questionsAmount)"
         let alertModel = AlertModel(
             title: result.title,
             message:result.text,
@@ -157,7 +157,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         alertPresenter?.showQuizResult(model: alertModel)
     }
     
-    private func showAnswerResults(isCorrect: Bool) {
+    private func showAnswerResults(isCorrect: Bool) { //Функция показа результатов ответа
         imageView.layer.masksToBounds = true
         imageView.layer.borderWidth = 8
         imageView.layer.borderColor = isCorrect ? UIColor.ypGreen.cgColor : UIColor.ypRed.cgColor
@@ -165,8 +165,6 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.showNextQuestionOrResults()
         }
-        
-        
         if isCorrect {
             correctAnswers += 1
         }
@@ -181,7 +179,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
     }
 
-    private func showNextQuestionOrResults() {
+    private func showNextQuestionOrResults() { //Функция показа следующнго вопроса или результата квиза 
         imageView.layer.borderWidth = 0
         if currentQuestionIndex == questionsAmount {
             imageView.layer.borderWidth = 8
@@ -211,7 +209,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
             })
             alertPresenter?.showQuizResult(model: finalScreen)
         } else {
-   //         presenter.switchToNextQuestion()
+           // presenter.switchToNextQuestion()
             currentQuestionIndex += 1
             questionFactory?.requestNextQuestion()
         
