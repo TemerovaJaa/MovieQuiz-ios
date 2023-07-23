@@ -22,6 +22,9 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private var imageView: UIImageView!
     @IBOutlet private var textLabel: UILabel!
     @IBOutlet private var counterLabel: UILabel!
+    @IBOutlet private weak var noButton: UIButton!
+    @IBOutlet private weak var yesButton: UIButton!
+    
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
         guard let currentQuestion = currentQuestion else {
             return
@@ -32,10 +35,11 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         
     }
     
-    private func noButtonClicked(_ sender: UIButton) {
+    @IBAction private func noButtonClicked(_ sender: UIButton) {
         guard let currentQuestion = currentQuestion else {
             return
         }
+        
         let givenAnswer = false
         
         showAnswerResults(isCorrect: givenAnswer == currentQuestion.correctAnswer)
@@ -74,6 +78,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         questionFactory?.requestNextQuestion()
         alertPresenter = AlertPresenter(delegate: self)
     }
+    
     
     func getMovie(from jsonString: String) -> Movie? {
         var movie: Movie? = nil
@@ -170,6 +175,19 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         }
     }
     
+    func switchToNextQuestion() {
+        currentQuestionIndex += 1
+    }
+    
+    func isLastQuestion() -> Bool {
+        currentQuestionIndex == questionsAmount - 1
+    }
+    
+    func restartGame() {
+        currentQuestionIndex = 0
+        correctAnswers = 0
+        questionFactory?.requestNextQuestion()
+    }
     
     private func show(quiz step: QuizStepViewModel) {
         imageView.image = step.image
@@ -180,42 +198,35 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     }
 
     private func showNextQuestionOrResults() { //Функция показа следующнго вопроса или результата квиза 
-        imageView.layer.borderWidth = 0
-        if currentQuestionIndex == questionsAmount {
-            imageView.layer.borderWidth = 8
-            statisticService?.store(correct: correctAnswers, total: questionsAmount)
-            guard let gamesCount = statisticService?.gamesCount else {
-                return }
-            guard let bestGame = statisticService?.bestGame else {
-                return }
-            guard let totalAccuracy = statisticService?.totalAccuracy else {
-                return }
+        if self.isLastQuestion() {
+            statisticService?.store(correct: correctAnswers, total: self.questionsAmount)
             
+            guard let gamesCount = statisticService?.gamesCount else { return }
+            guard let bestGame = statisticService?.bestGame else { return }
+            guard let totalAccuracy = statisticService?.totalAccuracy else { return }
             
             let finalScreen = AlertModel (title: "Этот раунд окончен!",
                                           message: """
-        Ваш результат: \(correctAnswers)/\(questionsAmount)
-         Количество сыгранных квизов: \(gamesCount)
-         Рекорд: \(bestGame.correct)/\(bestGame.total) (\(bestGame.date.dateTimeString))
-        Средняя точность: \(String(format: "%.2f", totalAccuracy))%
-        """ ,
+     Ваш результат: \(correctAnswers)/\(self.questionsAmount)
+     Количество сыгранных квизов: \(gamesCount)
+     Рекорд: \(bestGame.correct)/\(bestGame.total) (\(bestGame.date.dateTimeString))
+     Средняя точность: \(String(format: "%.2f", totalAccuracy))%
+     """ ,
                                           buttonText: "Сыграть еще раз",
-                                          completion: { [weak self] _ in
+                                          completion: { _ in [weak self] in
                 guard let self = self else { return }
-                self.imageView.layer.borderWidth = 0
-//                self.presenter.resetQuestionIndex()
+                
+                self.restartGame()
                 self.correctAnswers = 0
-                self.questionFactory?.requestNextQuestion()
+                
             })
-            alertPresenter?.showQuizResult(model: finalScreen)
+            viewController?.alertPresenter?.showQuizResult(model: finalScreen)
         } else {
-           // presenter.switchToNextQuestion()
-            currentQuestionIndex += 1
+            self.switchToNextQuestion()
             questionFactory?.requestNextQuestion()
-        
         }
-        
     }
 }
+
 
 
