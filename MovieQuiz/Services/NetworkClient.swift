@@ -4,6 +4,10 @@ import Foundation
 
 /// Отвечает за загрузку данных по URL
 struct NetworkClient {
+    func fetch(url: URL, handler: @escaping (Result<Data, Error>) -> Void)
+  }
+
+  struct NetworkClient: NetworkRouting {
 
     private enum NetworkError: Error { //Тут мы создали свою реализацию протокола Error, чтобы обозначить его на тот случай, если произойдёт ошибка
         case codeError
