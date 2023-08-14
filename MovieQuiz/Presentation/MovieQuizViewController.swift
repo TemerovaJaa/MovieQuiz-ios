@@ -1,6 +1,10 @@
 import UIKit
 
 final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
+    func didFailToLoadData(with error: Error) {
+
+    }
+    
     
     var alertPresenter: AlertPresenterProtocol?
     private var statisticService: StatisticService?
@@ -24,6 +28,7 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     @IBOutlet private var counterLabel: UILabel!
     @IBOutlet private weak var noButton: UIButton!
     @IBOutlet private weak var yesButton: UIButton!
+    @IBOutlet private var activityIndicator: UIActivityIndicatorView!
     
     @IBAction private func yesButtonClicked(_ sender: UIButton) {
         guard let currentQuestion = currentQuestion else {
@@ -55,30 +60,45 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+       
+       imageView.layer.cornerRadius = 20
+        questionFactory = QuestionFactory(moviesLoader: MoviesLoader(), delegate: self)
         statisticService = StatisticServiceImplementation()
-        var documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let fileName = "inception.json"
-        documentsURL.appendPathComponent(fileName)
-        let jsonString = try? String(contentsOf: documentsURL)
-        
-        guard let data = jsonString?.data(using: .utf8) else {
-            return
-        }
-        do {
-            let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
-            _ = json?["title"]
-            _ = json?["year"]
-            
-            print(json as Any)
-        } catch {
-            print("Failed to parse: \(String(describing: jsonString))")
-        }
-        
-        questionFactory = QuestionFactory(delegate: self)
-        questionFactory?.requestNextQuestion()
-        alertPresenter = AlertPresenter(delegate: self)
+
+        showLoadingIndicator()
+        questionFactory?.loadData()
     }
     
+    func sendFirstRequest() {
+        // создаём адрес
+        guard let url = URL(string: "https://imdb-api.com/en/API/MostPopularTVs/k_kiwxbi4y") else { return }
+        // создаём запрос
+        let request = URLRequest(url: url)
+        
+        /*
+        Также запросу можно добавить HTTP метод, хедеры и тело запроса.
+        
+        request.httpMethod = "GET" // здесь можно указать HTTP метод — по умолчанию он GET
+        request.allHTTPHeaderFields = [:] // а тут хедеры
+        request.httpBody = nil // а здесь тело запроса
+        */
+        
+        // Создаём задачу на отправление запроса в сеть
+        let task: URLSessionDataTask = URLSession.shared.dataTask(with: request) { data, response, error in
+            // здесь мы обрабатываем ответ от сервера
+            
+            // data — данные от сервера
+            // response — ответ от сервера, содержащий код ответа, хедеры и другую информацию об ответе
+            // error — ошибка ответа, если что-то пошло не так
+        }
+        // Отправляем запрос
+        task.resume()
+    }
+    
+    private func showLoadingIndicator() {
+        activityIndicator?.isHidden = false
+        activityIndicator?.startAnimating()
+    }
     
     func getMovie(from jsonString: String) -> Movie? {
         var movie: Movie? = nil
@@ -137,11 +157,10 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
     // MARK: - QuestionFactoryDelegate
     
     private func convert(model: QuizQuestion) -> QuizStepViewModel {
-        let questionStep = QuizStepViewModel(
-            image: UIImage(named: model.image) ?? UIImage(),
+        return QuizStepViewModel(
+            image: UIImage(data: model.image) ?? UIImage(),
             question: model.text,
             questionNumber: "\(currentQuestionIndex + 1)/\(questionsAmount)")
-        return questionStep
     }
     
     private func show(quiz result: QuizResultsViewModel) {
@@ -188,13 +207,35 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
         correctAnswers = 0
         questionFactory?.requestNextQuestion()
     }
+
+    func didLoadDataFromServer() {
+        activityIndicator?.isHidden = true
+        questionFactory?.requestNextQuestion()
+    }
     
     private func show(quiz step: QuizStepViewModel) {
         imageView.image = step.image
         textLabel.text = step.question
         counterLabel.text = step.questionNumber
         
+}
+    
+    private func showNetworkError(message: String) {
+        activityIndicator.isHidden = false
+        activityIndicator.startAnimating()
         
+        let model = AlertModel(title: "Ошибка",
+                               message: message,
+                               buttonText: "Попробовать еще раз") { [weak self] _ in
+            guard let self = self else { return }
+            
+            self.currentQuestionIndex = 0
+            self.correctAnswers = 0
+            
+            self.questionFactory?.requestNextQuestion()
+        }
+        
+        alertPresenter?.showQuizResult(model: model)
     }
 
     private func showNextQuestionOrResults() { //Функция показа следующнго вопроса или результата квиза 
@@ -213,14 +254,14 @@ final class MovieQuizViewController: UIViewController, QuestionFactoryDelegate {
      Средняя точность: \(String(format: "%.2f", totalAccuracy))%
      """ ,
                                           buttonText: "Сыграть еще раз",
-                                          completion: { _ in [weak self] in
+                                          completion: { [weak self] _ in
                 guard let self = self else { return }
                 
                 self.restartGame()
                 self.correctAnswers = 0
                 
             })
-            viewController?.alertPresenter?.showQuizResult(model: finalScreen)
+            self.alertPresenter?.showQuizResult(model: finalScreen)
         } else {
             self.switchToNextQuestion()
             questionFactory?.requestNextQuestion()
